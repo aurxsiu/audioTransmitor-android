@@ -3,22 +3,12 @@ package com.aurxsiu.audiotransmitor;
 import android.app.Activity;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class MainActivity extends Activity {
@@ -35,80 +25,48 @@ public class MainActivity extends Activity {
         });
     }
 
-    private AudioTrack audioTrack;
-    private boolean playing = false;
     public void getConnected(){
-        int sampleRate = 44100;
-        int channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
-        int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-
-        int bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat);
-
-        /*audioTrack = new AudioTrack(
-                AudioManager.STREAM_MUSIC,
-                sampleRate,
-                channelConfig,
-                audioFormat,
-                bufferSize,
-                AudioTrack.MODE_STREAM
-        );*/
-
-        AudioFormat format = new AudioFormat.Builder()
-                .setSampleRate(sampleRate)
-                .setEncoding(audioFormat)
-                .setChannelMask(channelConfig)
-                .build();
-
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build();
-
-        audioTrack = new AudioTrack.Builder()
-                .setAudioFormat(format)
-                .setAudioAttributes(attributes)
-                .setTransferMode(AudioTrack.MODE_STREAM)
-                .setBufferSizeInBytes(bufferSize)
-                .build();
-
-
-        audioTrack.play();
-        playing = true;
-        new Thread(()->{
-            try (Socket socket = new Socket("192.168.78.123",20232)) {
-                Log.d("test","getConnected: "+socket.isConnected());
-                start(socket.getInputStream());
-            } catch (IOException e) {
-                Log.e("test", "getConnected: ");
-                throw new RuntimeException(e);
-            }
-        }).start();
-
-    }
-    public void start(InputStream inputStream) {
-
-
         new Thread(() -> {
             try {
-                byte[] buffer = new byte[40960];
-                int bytesRead;
-                while (playing && (bytesRead = inputStream.read(buffer)) != -1) {
-                    audioTrack.write(buffer, 0, bytesRead);
+                Socket socket = new Socket("192.168.78.123", 20232);
+                InputStream inputStream = socket.getInputStream();
+
+                int sampleRate = 44100;
+                int channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+                int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+                int bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+
+                AudioTrack audioTrack = new AudioTrack.Builder()
+                        .setAudioAttributes(new AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .build())
+                        .setAudioFormat(new AudioFormat.Builder()
+                                .setEncoding(audioFormat)
+                                .setSampleRate(sampleRate)
+                                .setChannelMask(channelConfig)
+                                .build())
+                        .setBufferSizeInBytes(bufferSize)
+                        .setTransferMode(AudioTrack.MODE_STREAM)
+                        .build();
+
+                audioTrack.play();
+
+                byte[] buffer = new byte[bufferSize];
+                int len;
+                while ((len = inputStream.read(buffer)) != -1) {
+                    audioTrack.write(buffer, 0, len);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                stop();
+
+                audioTrack.stop();
+                audioTrack.release();
+                inputStream.close();
+                socket.close();
+
+            } catch (Exception e) {
+                Log.e("AudioStream", "播放异常", e);
             }
         }).start();
-    }
 
-    public void stop() {
-        playing = false;
-        if (audioTrack != null) {
-            audioTrack.stop();
-            audioTrack.release();
-            audioTrack = null;
-        }
     }
 }
