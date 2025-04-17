@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     public void getConnected(){
         new Thread(() -> {
             try {
-                Socket socket = new Socket("192.168.78.123", 20232);
+                Socket socket = new Socket("192.168.78.123", 20233);
                 InputStream inputStream = socket.getInputStream();
 
                 int sampleRate = 44100;
