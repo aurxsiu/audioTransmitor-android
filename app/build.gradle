@@ -37,4 +37,8 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+    // https://mvnrepository.com/artifact/commons-validator/commons-validator
+    implementation("commons-validator:commons-validator:1.7")
 }

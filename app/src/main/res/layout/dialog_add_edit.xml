@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:padding="16dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/inputContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="内容" />
+
+    <EditText
+        android:id="@+id/inputRemark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="备注" />
+
+    <Button
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="确认" />
+</LinearLayout>
