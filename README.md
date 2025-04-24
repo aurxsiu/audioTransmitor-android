@@ -17,6 +17,6 @@ AudioTransmitor的windows端:https://github.com/aurxsiu/AudioTransmitor-java-win
 等待安卓端连接
 # 不会实现的功能
 ## 广播实现设备的侦测
-网络环境复杂,广播功能个可能被扳,反正我是被封了,没有测试环境
+网络环境复杂,广播功能可能被扳,反正我是被封了,没有测试环境
 ## 其它设备的互联
 没有测试环境
