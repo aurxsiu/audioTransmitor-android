@@ -35,16 +35,14 @@ public class Connector {
                         .build();
 
                 audioTrack.play();
-
                 Log.d("aurxsiu","bufferSize:"+bufferSize);
-
                 byte[] buffer = new byte[bufferSize];
                 int len;
                 while ((len = inputStream.read(buffer)) != -1) {
                     //todo 这个值建议后面可以调节
-                    if(inputStream.available() > 327680){
-                        audioTrack.flush();
-                        long skip = inputStream.skip(inputStream.available());
+                    //todo 可能出现截断错误?
+                    if(inputStream.available() > bufferSize*10){
+                        long skip = inputStream.skip((long) inputStream.available() / bufferSize *bufferSize);
                         Log.d("aurxsiu", "getConnected: flush,skip:"+skip);
                     }else{
                         audioTrack.write(buffer, 0, len);
